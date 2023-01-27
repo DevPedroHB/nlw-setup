@@ -21,40 +21,54 @@ interface HabitsInfo {
 export function HabitsList({ date, onCompletedChanged }: HabitLisProps) {
   const [habitsInfo, setHabitsInfo] = useState<HabitsInfo>();
 
-  useEffect(() => {
-    api
-      .get("day", {
+  async function fetchHabits() {
+    try {
+      const response = await api.get("day", {
         params: {
           date: date.toISOString(),
         },
-      })
-      .then((response) => {
-        setHabitsInfo(response.data);
       });
+
+      setHabitsInfo(response.data);
+    } catch (error) {
+      console.log(error);
+
+      alert("Ops, Não foi possível carregar as informações dos hábitos");
+    }
+  }
+
+  useEffect(() => {
+    fetchHabits();
   }, []);
 
   async function handleToggleHabit(habitId: string) {
-    const isHabitAlreadyCompleted =
-      habitsInfo!.completedHabits.includes(habitId);
+    try {
+      const isHabitAlreadyCompleted =
+        habitsInfo!.completedHabits.includes(habitId);
 
-    await api.patch(`/habits/${habitId}/toggle`);
+      await api.patch(`/habits/${habitId}/toggle`);
 
-    let completedHabits: string[] = [];
+      let completedHabits: string[] = [];
 
-    if (isHabitAlreadyCompleted) {
-      completedHabits = habitsInfo!.completedHabits.filter(
-        (id) => id !== habitId
-      );
-    } else {
-      completedHabits = [...habitsInfo!.completedHabits, habitId];
+      if (isHabitAlreadyCompleted) {
+        completedHabits = habitsInfo!.completedHabits.filter(
+          (id) => id !== habitId
+        );
+      } else {
+        completedHabits = [...habitsInfo!.completedHabits, habitId];
+      }
+
+      setHabitsInfo({
+        possibleHabits: habitsInfo!.possibleHabits,
+        completedHabits,
+      });
+
+      onCompletedChanged(completedHabits.length);
+    } catch (error) {
+      console.log(error);
+
+      alert("Ops, Não foi possível atualizar o status do hábito.");
     }
-
-    setHabitsInfo({
-      possibleHabits: habitsInfo!.possibleHabits,
-      completedHabits,
-    });
-
-    onCompletedChanged(completedHabits.length);
   }
 
   const isDateInPast = dayjs(date).endOf("day").isBefore(new Date());

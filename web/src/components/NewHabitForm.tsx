@@ -20,19 +20,27 @@ export function NewHabitForm() {
   async function createNewHabit(e: FormEvent) {
     e.preventDefault();
 
-    if (!title || weekDays.length === 0) {
-      return;
+    try {
+      if (!title || weekDays.length === 0) {
+        return alert(
+          "Novo hábito, Informe o nome do hábito e escolha a periodicidade."
+        );
+      }
+
+      await api.post("habits", {
+        title,
+        weekDays,
+      });
+
+      setTitle("");
+      setWeekDays([]);
+
+      alert("Novo hábito, Hábito criado com sucesso!");
+    } catch (error) {
+      console.log(error);
+
+      alert("Ops, Não foi possível criar o novo hábito");
     }
-
-    await api.post("habits", {
-      title,
-      weekDays,
-    });
-
-    setTitle("");
-    setWeekDays([]);
-
-    alert("Hábito criado com sucesso!");
   }
 
   function handleToggleWeekDay(weekDay: number) {

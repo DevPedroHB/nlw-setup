@@ -19,10 +19,20 @@ type Summary = {
 export function SummaryTable() {
   const [summary, setSummary] = useState<Summary[]>([]);
 
-  useEffect(() => {
-    api.get("summary").then((response) => {
+  async function fetchSummary() {
+    try {
+      const response = await api.get("summary");
+
       setSummary(response.data);
-    });
+    } catch (error) {
+      console.log(error);
+
+      alert("Ops, Não foi possível carregar o sumário de hábitos.");
+    }
+  }
+
+  useEffect(() => {
+    fetchSummary();
   }, []);
 
   return (

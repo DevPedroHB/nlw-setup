@@ -129,7 +129,14 @@ export async function appRoutes(app: FastifyInstance) {
           FROM habit_week_days HWD
           JOIN habits H ON H.id = HWD.habit_id
           WHERE
-            HWD.week_day = cast(strftime('%w', D.date/1000.0, 'unixepoch') AS INT)
+          /**
+            No SQLite,
+            HWD.week_day = cast(strftime('%w', D.date/1000.0, 'unixepoch') AS FLOAT)
+
+            No MySQL
+            HWD.week_day = cast(DATE_FORMAT(D.date/1000.0, '%w') AS FLOAT)
+          */
+            HWD.week_day = cast(DATE_FORMAT(D.date/1000.0, '%w') AS FLOAT)
             AND H.created_at <= D.date
         ) AS amount
       FROM days D
