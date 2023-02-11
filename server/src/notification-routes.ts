@@ -2,11 +2,19 @@ import { FastifyInstance } from "fastify";
 import WevPush from "web-push";
 import { z } from "zod";
 
-const publicKey =
-  "BJkbFo7RwnhdsjzomkVEjxHDAOWvK63ndEh_FX59md6X5fLNlkb1sunWuTfzLTvydVHqjZd_x05Zk3TsA3bwSI0";
-const privateKey = "GjXZySBXx-XMA_EC52ApCy8Y84xDZ7fS2rA_TKZK4SQ";
+const publicKey = String(process.env.NOTIFICATION_PUBLIC_KEY);
+const privateKey = String(process.env.NOTIFICATION_PRIVATE_KEY);
 
-WevPush.setVapidDetails("http://localhost:3333", publicKey, privateKey);
+console.log({
+  privateKey,
+  publicKey,
+});
+
+WevPush.setVapidDetails(
+  "https://habits-server-r78d.onrender.com",
+  publicKey,
+  privateKey
+);
 
 export async function notificationRoutes(app: FastifyInstance) {
   app.get("/push/public_key", () => {
